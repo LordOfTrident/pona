@@ -13,6 +13,7 @@
 		<img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/LordOfTrident/pona?color=0088ff"/>
 	</a>
 	<br><br><br>
+	<img width="600px" src="res/screenshots.png"/>
 </p>
 
 ## Table of contents
