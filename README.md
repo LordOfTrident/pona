@@ -20,9 +20,7 @@
 * [Introduction](#introduction)
 * [Features](#features)
 * [Bugs](#bugs)
-* [Documentation](#documentation)
 * [Dependencies](#dependencies)
-  * [Linux](#linux)
 * [Make](#make)
 
 ## Introduction
