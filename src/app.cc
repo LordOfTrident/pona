@@ -218,6 +218,9 @@ void Defaults() {
 
 void ReadOrFixConfig() {
 	// create missing directories
+	if (not Utils::PathExists(Utils::Home()/".config"))
+		std::fs::create_directory(Utils::Home()/".config");
+
 	if (not Utils::PathExists(ConfigPath()))
 		std::fs::create_directory(ConfigPath());
 
@@ -246,8 +249,6 @@ void ReadOrFixConfig() {
 	else
 		WriteConfigFile();
 }
-
-#include <iostream>
 
 void ReadConfigFile() {
 	std::string buffer;
