@@ -345,7 +345,7 @@ void Editor::RenderInfoBar() {
 	std::string posStr = std::to_string(buffer.GetCursor().y + 1) +
 	                     ':' + std::to_string(buffer.GetCursor().x + 1);
 	mvwaddstr(m_win, m_winSize.y - 1, m_winSize.x - posStr.length() - 1, posStr.c_str());
-	mvwaddstr(m_win, m_winSize.y - 1, 1, "^H ");
+	mvwaddstr(m_win, m_winSize.y - 1, 1, "^G ");
 
 	NC::WSetColor(m_win, NC::ColorPair::Editor_InfoBarSeparator);
 	waddch(m_win, '|');

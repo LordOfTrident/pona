@@ -25,17 +25,17 @@
 		"It is the bottom bar under your editor window. This bar contains some basic info about", \
 		"the file. Lets take it apart.", \
 		"", \
-		"> ^H | ASCII | LF | RW | txt", \
+		"> ^G | ASCII | LF | RW | txt", \
 		"", \
 		"This is an example of some basic info the bar might show.", \
-		"- `^H`    is telling you what to press when you are lost", \
+		"- `^G`    is telling you what to press when you are lost", \
 		"- `ASCII` shows what encoding you are editing in", \
 		"- `LF`    is the symbols used for new lines (on windows, its usually CRLF)", \
 		"- `RW`    tells you whether the file is for both writing, reading (RW) or reading only (R)", \
 		"- `txt`   shows the file type", \
 		"", \
 		"## List of commands", \
-		"- `help` (`^H`)              - Show the pona help", \
+		"- `help` (`^G`)              - Show the pona help", \
 		"- `exit`                     - Exit the editor", \
 		"- `new` [str:title...] (^T)  - Open new tab(s)", \
 		"- `close` (^Q)               - Close the current tab", \

@@ -47,7 +47,7 @@ in the editor.
 - [ ] Lua plugins
 
 ## Bugs
-If you find any bugs, please create an issue and describe them.
+If you find any bugs, please create an issue and report them.
 
 ## Dependencies
 - [ncurses](https://en.wikipedia.org/wiki/Ncurses)

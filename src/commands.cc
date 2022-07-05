@@ -3,7 +3,7 @@
 // ONLY space (' ') means no shortcut, dont use anything else for that
 const std::map<std::string, std::pair<bool, char>> Commands::g_list = {
 //   command name       needs arguments?      shortcut
-	{"help",            std::make_pair(false, 'h')},
+	{"help",            std::make_pair(false, 'g')},
 	{"defaults",        std::make_pair(false, ' ')},
 	{"mark_column",     std::make_pair(true,  ' ')},
 	{"indent_size",     std::make_pair(true,  ' ')},
