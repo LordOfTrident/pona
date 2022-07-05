@@ -187,8 +187,26 @@ void Buffer::CursorDelete() {
 			CursorLine() = linePart1 + linePart2;
 			m_cursor.x   = linePart1.length();
 		} else {
-			for (std::size_t i = selectionStart.y + 1; i < selectionEnd.y; -- selectionEnd.y)
-				rawBuffer.erase(rawBuffer.begin() + i);
+			// optimize selection deleting
+			// basically, if the selection size is bigger than half of the file size,
+			// we instead copy all the unselected lines to a new buffer and clear the old one
+			if (selectionEnd.y - selectionStart.y < Size() / 2) {
+				for (std::size_t i = selectionStart.y + 1; i <= selectionEnd.y; -- selectionEnd.y)
+					rawBuffer.erase(rawBuffer.begin() + i);
+			} else {
+				std::vector<std::string> bufferCopy;
+
+				for (std::size_t i = 0; i <= selectionStart.y; ++ i)
+					bufferCopy.push_back(rawBuffer.at(i));
+
+				for (std::size_t i = selectionEnd.y; i < Size(); ++ i)
+					bufferCopy.push_back(rawBuffer.at(i));
+
+				selectionEnd.y = selectionStart.y + 1;
+
+				rawBuffer.clear();
+				rawBuffer = std::move(bufferCopy); // call std::move to avoid copying
+			}
 
 			std::string linePart1 = rawBuffer.at(selectionStart.y).substr(0, selectionStart.x);
 			std::string linePart2 = rawBuffer.at(selectionEnd.y).substr(selectionEnd.x);

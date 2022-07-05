@@ -397,7 +397,7 @@ void Editor::RenderLine(Vec2Dw &p_pos, bool p_isCursorLine) {
 				inSelection = true;
 			else if (
 				selectionStart.y == p_pos.y and selectionEnd.y == p_pos.y and
-				selectionStart.x <= p_pos.x and selectionEnd.x >= p_pos.x
+				selectionStart.x <= p_pos.x and selectionEnd.x >  p_pos.x
 			)
 				inSelection = true;
 			else if (
