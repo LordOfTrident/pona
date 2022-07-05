@@ -41,7 +41,7 @@ in the editor.
 - [x] Themes
 - [X] Command line
 - [X] Mouse input
-- [ ] Selection
+- [X] Selection
 - [ ] Copy/cut/paste
 - [ ] Lua plugins
 
