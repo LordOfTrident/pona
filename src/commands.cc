@@ -396,6 +396,10 @@ void Commands::Run(std::vector<std::string> p_tokens) {
 
 			if (line >= editor.buffer.Size())
 				line = editor.buffer.Size() - 1;
+			if (line == 0)
+				line = 1;
+
+			-- line;
 
 			editor.buffer.SetCursor(Vec2Dw(0, line));
 			editor.Update();

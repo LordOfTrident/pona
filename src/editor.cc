@@ -466,8 +466,6 @@ void Editor::RenderLine(Vec2Dw &p_pos, bool p_isCursorLine) {
 	for (p_pos.x = m_scroll.x; p_pos.x - m_scroll.x < m_maxLineLength; ++ p_pos.x) {
 		bool markColumn = m_markedColumn and p_pos.x == m_markedColumn;
 		bool isBeyondMarkedColumn = m_markedColumn and p_pos.x > m_markedColumn;
-		if ((markColumn or isBeyondMarkedColumn) and not p_isCursorLine)
-			NC::WSetColor(m_win, NC::ColorPair::Editor_MarkedColumn);
 
 		bool inSelection = false;
 		if (buffer.HasSelection()) {
@@ -493,6 +491,8 @@ void Editor::RenderLine(Vec2Dw &p_pos, bool p_isCursorLine) {
 		if (p_pos.x < line.length()) {
 			if (inSelection)
 				NC::WSetColor(m_win, NC::ColorPair::Editor_Selection);
+			else if ((markColumn or isBeyondMarkedColumn) and not p_isCursorLine)
+				NC::WSetColor(m_win, NC::ColorPair::Editor_MarkedColumn);
 			else
 				NC::WSetColor(m_win, lineColor);
 
@@ -515,8 +515,12 @@ void Editor::RenderLine(Vec2Dw &p_pos, bool p_isCursorLine) {
 			if (inSelection and p_pos.x == line.length()) {
 				NC::WSetColor(m_win, NC::ColorPair::Editor_Selection);
 				waddch(m_win, ' ');
-			} else if (buffer.HasSelection()) {
-				NC::WSetColor(m_win, lineColor);
+			} else {
+				if ((markColumn or isBeyondMarkedColumn) and not p_isCursorLine)
+					NC::WSetColor(m_win, NC::ColorPair::Editor_MarkedColumn);
+				else
+					NC::WSetColor(m_win, lineColor);
+
 
 				if (markColumn) { // draw the mark column
 					wattron(m_win, A_ALTCHARSET);
