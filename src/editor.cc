@@ -159,15 +159,87 @@ void Editor::Input(NC::input_t p_input) {
 	case NC::Key::Enter:     if (not m_readOnly) buffer.CursorSplit();  break;
 
 	// cursor movement
-	case NC::Key::Right: buffer.CursorRight(); break;
-	case NC::Key::Left:  buffer.CursorLeft();  break;
-	case NC::Key::Up:    buffer.CursorUp();    break;
-	case NC::Key::Down:  buffer.CursorDown();  break;
+	case NC::Key::Right: buffer.UnmarkSelection(); buffer.CursorRight(); break;
+	case NC::Key::Left:  buffer.UnmarkSelection(); buffer.CursorLeft();  break;
+	case NC::Key::Up:    buffer.UnmarkSelection(); buffer.CursorUp();    break;
+	case NC::Key::Down:  buffer.UnmarkSelection(); buffer.CursorDown();  break;
 
-	case NC::Key::Ctrl(NC::Key::Right): buffer.CursorWordRight(); break;
-	case NC::Key::Ctrl(NC::Key::Left):  buffer.CursorWordLeft();  break;
-	case NC::Key::Ctrl(NC::Key::Up):    buffer.CursorFullUp();    break;
-	case NC::Key::Ctrl(NC::Key::Down):  buffer.CursorFullDown();  break;
+	// cursor movement + selection
+	case NC::Key::Shift(NC::Key::Right):
+		if (not buffer.HasSelection())
+			buffer.MarkSelection();
+
+		buffer.CursorRight();
+
+		break;
+
+	case NC::Key::Shift(NC::Key::Left):
+		if (not buffer.HasSelection())
+			buffer.MarkSelection();
+
+		buffer.CursorLeft();
+
+		break;
+
+	case NC::Key::Shift(NC::Key::Up):
+		if (not buffer.HasSelection())
+			buffer.MarkSelection();
+
+		buffer.CursorUp();
+
+		break;
+
+	case NC::Key::Shift(NC::Key::Down):
+		if (not buffer.HasSelection())
+			buffer.MarkSelection();
+
+		buffer.CursorDown();
+
+		break;
+
+	case NC::Key::Ctrl(NC::Key::Right): buffer.UnmarkSelection(); buffer.CursorWordRight(); break;
+	case NC::Key::Ctrl(NC::Key::Left):  buffer.UnmarkSelection(); buffer.CursorWordLeft();  break;
+	case NC::Key::Ctrl(NC::Key::Up):    buffer.UnmarkSelection(); buffer.CursorFullUp();    break;
+	case NC::Key::Ctrl(NC::Key::Down):  buffer.UnmarkSelection(); buffer.CursorFullDown();  break;
+
+	case NC::Key::Shift(NC::Key::Ctrl(NC::Key::Right)):
+		if (not buffer.HasSelection())
+			buffer.MarkSelection();
+
+		buffer.CursorWordRight();
+
+		break;
+
+	case NC::Key::Shift(NC::Key::Ctrl(NC::Key::Left)):
+		if (not buffer.HasSelection())
+			buffer.MarkSelection();
+
+		buffer.CursorWordLeft();
+
+		break;
+
+	case NC::Key::Shift(NC::Key::Ctrl(NC::Key::Up)):
+		if (not buffer.HasSelection())
+			buffer.MarkSelection();
+
+		buffer.CursorFullUp();
+
+		break;
+
+	case NC::Key::Shift(NC::Key::Ctrl(NC::Key::Down)):
+		if (not buffer.HasSelection())
+			buffer.MarkSelection();
+
+		buffer.CursorFullDown();
+
+		break;
+
+	case NC::Key::Ctrl('a'):
+		buffer.CursorFullDown();
+		buffer.MarkSelection();
+		buffer.CursorFullUp();
+
+		break;
 
 	case NC::Key::PrevPage: ScrollUp();   break;
 	case NC::Key::NextPage: ScrollDown(); break;
@@ -304,11 +376,14 @@ void Editor::RenderLine(Vec2Dw &p_pos, bool p_isCursorLine) {
 	const std::string &ref = buffer.rawBuffer.at(p_pos.y);
 	m_lineTabs = std::count(ref.begin(), ref.begin() + m_scroll.x, '\t') * buffer.indentSize;
 
-	NC::WSetColor(m_win, p_isCursorLine? NC::ColorPair::Editor_Current :
-	              NC::ColorPair::Editor);
+	short lineColor = p_isCursorLine? NC::ColorPair::Editor_Current : NC::ColorPair::Editor;
+	NC::WSetColor(m_win, lineColor);
 
 	std::string line = ref;
 	line = std::regex_replace(line, std::regex("\t"), std::string(buffer.indentSize, ' '));
+
+	const Vec2Dw &selectionStart = buffer.GetSelectionStart();
+	const Vec2Dw &selectionEnd   = buffer.GetSelectionEnd();
 
 	for (p_pos.x = m_scroll.x; p_pos.x - m_scroll.x < m_maxLineLength; ++ p_pos.x) {
 		bool markColumn = m_markedColumn and p_pos.x == m_markedColumn;
@@ -316,7 +391,33 @@ void Editor::RenderLine(Vec2Dw &p_pos, bool p_isCursorLine) {
 		if ((markColumn or isBeyondMarkedColumn) and not p_isCursorLine)
 			NC::WSetColor(m_win, NC::ColorPair::Editor_MarkedColumn);
 
+		bool inSelection = false;
+		if (buffer.HasSelection()) {
+			if (selectionStart.y < p_pos.y and selectionEnd.y > p_pos.y)
+				inSelection = true;
+			else if (
+				selectionStart.y == p_pos.y and selectionEnd.y == p_pos.y and
+				selectionStart.x <= p_pos.x and selectionEnd.x >= p_pos.x
+			)
+				inSelection = true;
+			else if (
+				selectionStart.y == p_pos.y and selectionEnd.y != p_pos.y and
+				selectionStart.x <= p_pos.x
+			)
+				inSelection = true;
+			else if (
+				selectionEnd.y == p_pos.y and selectionStart.y != p_pos.y and
+				selectionEnd.x > p_pos.x
+			)
+				inSelection = true;
+		}
+
 		if (p_pos.x < line.length()) {
+			if (inSelection)
+				NC::WSetColor(m_win, NC::ColorPair::Editor_Selection);
+			else
+				NC::WSetColor(m_win, lineColor);
+
 			char ch = line.at(p_pos.x);
 
 			if (markColumn and ch == ' ') {
@@ -333,16 +434,23 @@ void Editor::RenderLine(Vec2Dw &p_pos, bool p_isCursorLine) {
 			} else
 				waddch(m_win, line.at(p_pos.x));
 		} else {
-			if (markColumn) { // draw the mark column
-				wattron(m_win, A_ALTCHARSET);
+			if (inSelection and p_pos.x == line.length()) {
+				NC::WSetColor(m_win, NC::ColorPair::Editor_Selection);
+				waddch(m_win, ' ');
+			} else if (buffer.HasSelection()) {
+				NC::WSetColor(m_win, lineColor);
 
-				mvwaddch(m_win, p_pos.y - m_scroll.y,
-				        p_pos.x + m_rulerWidth - m_scroll.x, ACS_VLINE);
+				if (markColumn) { // draw the mark column
+					wattron(m_win, A_ALTCHARSET);
 
-				wattroff(m_win, A_ALTCHARSET);
-			} else if (p_isCursorLine or isBeyondMarkedColumn)
-				waddch(m_win, ' '); // draw a space so the selection line and the
-				                    // marked column background are drawn
+					mvwaddch(m_win, p_pos.y - m_scroll.y,
+					        p_pos.x + m_rulerWidth - m_scroll.x, ACS_VLINE);
+
+					wattroff(m_win, A_ALTCHARSET);
+				} else if (p_isCursorLine or isBeyondMarkedColumn)
+					waddch(m_win, ' '); // draw a space so the selection line and the
+					                    // marked column background are drawn
+			}
 		}
 	}
 }

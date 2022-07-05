@@ -97,6 +97,9 @@
 		"marked_column_fg = red", \
 		"marked_column_bg = black", \
 		"", \
+		"selection_fg = black", \
+		"selection_bg = white", \
+		"", \
 		"[scroll_bar]", \
 		"fg            = cyan", \
 		"bg            = blue", \
@@ -148,6 +151,9 @@
 		"", \
 		"marked_column_fg = red", \
 		"marked_column_bg = blue", \
+		"", \
+		"selection_fg = blue", \
+		"selection_bg = white", \
 		"", \
 		"[scroll_bar]", \
 		"fg            = cyan", \
@@ -201,6 +207,9 @@
 		"marked_column_fg = cyan", \
 		"marked_column_bg = blue", \
 		"", \
+		"selection_fg = blue", \
+		"selection_bg = white", \
+		"", \
 		"[scroll_bar]", \
 		"fg            = black", \
 		"bg            = black", \
@@ -252,6 +261,9 @@
 		"", \
 		"marked_column_fg = grey", \
 		"marked_column_bg = default", \
+		"", \
+		"selection_fg = black", \
+		"selection_bg = white", \
 		"", \
 		"[scroll_bar]", \
 		"fg            = black", \

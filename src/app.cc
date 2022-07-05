@@ -30,6 +30,7 @@ std::array<ColorPairKeyPair, NC::ColorPair::ReservedEnd - 1> g_keyToColorPairMap
 	ColorPairKeyPair("editor", "ruler_current", NC::ColorPair::Editor_RulerCurrent),
 
 	ColorPairKeyPair("editor", "marked_column", NC::ColorPair::Editor_MarkedColumn),
+	ColorPairKeyPair("editor", "selection",     NC::ColorPair::Editor_Selection),
 
 	ColorPairKeyPair("scroll_bar", "",           NC::ColorPair::Editor_ScrollBar),
 	ColorPairKeyPair("scroll_bar", "button",     NC::ColorPair::Editor_ScrollButton),
@@ -207,6 +208,7 @@ void Defaults() {
 	init_pair(NC::ColorPair::Editor_InfoBar,          NC::Color::Black,  NC::Color::White);
 	init_pair(NC::ColorPair::Editor_InfoBarSeparator, NC::Color::Black,  NC::Color::White);
 	init_pair(NC::ColorPair::Editor_MarkedColumn,     NC::Color::Red,    NC::Color::Black);
+	init_pair(NC::ColorPair::Editor_Selection,        NC::Color::Black,  NC::Color::White);
 
 	g_config.ruler        = true;
 	g_config.trimOnSave   = false;

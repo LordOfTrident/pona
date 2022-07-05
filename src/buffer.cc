@@ -5,6 +5,7 @@ Buffer::Buffer(const std::vector<std::string> &p_buffer):
 
 	rawBuffer(p_buffer),
 	m_modified(false),
+	m_selection(false),
 
 	m_furthestCursorX(0)
 {}
@@ -164,6 +165,9 @@ void Buffer::CursorFullDown() {
 
 
 void Buffer::CursorInsert(char p_ch) {
+	if (m_selection)
+		CursorDelete();
+
 	CursorLine().insert(m_cursor.x, std::string(1, p_ch));
 	++ m_cursor.x;
 
@@ -172,17 +176,44 @@ void Buffer::CursorInsert(char p_ch) {
 }
 
 void Buffer::CursorDelete() {
-	if (m_cursor.x > 0) {
-		CursorLine().erase(m_cursor.x - 1, 1);
-		-- m_cursor.x;
-	} else if (m_cursor.y > 0) {
-		std::string oldLine = CursorLine();
+	if (m_selection) {
+		Vec2Dw selectionStart = GetSelectionStart();
+		Vec2Dw selectionEnd   = GetSelectionEnd();
 
-		rawBuffer.erase(rawBuffer.begin() + m_cursor.y);
-		-- m_cursor.y;
-		m_cursor.x = CursorLine().length();
+		if (selectionStart.y == selectionEnd.y) {
+			std::string linePart1 = CursorLine().substr(0, selectionStart.x);
+			std::string linePart2 = CursorLine().substr(selectionEnd.x);
 
-		CursorLine() += oldLine;
+			CursorLine() = linePart1 + linePart2;
+			m_cursor.x   = linePart1.length();
+		} else {
+			for (std::size_t i = selectionStart.y + 1; i < selectionEnd.y; -- selectionEnd.y)
+				rawBuffer.erase(rawBuffer.begin() + i);
+
+			std::string linePart1 = rawBuffer.at(selectionStart.y).substr(0, selectionStart.x);
+			std::string linePart2 = rawBuffer.at(selectionEnd.y).substr(selectionEnd.x);
+
+			rawBuffer.erase(rawBuffer.begin() + selectionEnd.y);
+
+			m_cursor.y   = selectionStart.y;
+			CursorLine() = linePart1 + linePart2;
+			m_cursor.x   = linePart1.length();
+		}
+
+		m_selection = false;
+	} else {
+		if (m_cursor.x > 0) {
+			CursorLine().erase(m_cursor.x - 1, 1);
+			-- m_cursor.x;
+		} else if (m_cursor.y > 0) {
+			std::string oldLine = CursorLine();
+
+			rawBuffer.erase(rawBuffer.begin() + m_cursor.y);
+			-- m_cursor.y;
+			m_cursor.x = CursorLine().length();
+
+			CursorLine() += oldLine;
+		}
 	}
 
 	m_furthestCursorX = m_cursor.x + CountLineTabs();
@@ -190,6 +221,9 @@ void Buffer::CursorDelete() {
 }
 
 void Buffer::CursorSplit() {
+	if (m_selection)
+		CursorDelete();
+
 	std::string newLine = CursorLine().substr(m_cursor.x);
 	if (newLine.length() > 0)
 		CursorLine().erase(m_cursor.x);
@@ -213,9 +247,38 @@ void Buffer::UpdateCursorY() {
 }
 
 void Buffer::UpdateCursor() {
-	// Y has to be updated first, else CursorLine is gonna throw if it is not correct
+	// Y has to be updated first, else UpdateCursorX() may throw
 	UpdateCursorY();
 	UpdateCursorX();
+}
+
+void Buffer::MarkSelection() {
+	m_selectionStart = m_cursor;
+	m_selection      = true;
+}
+
+void Buffer::UnmarkSelection() {
+	m_selection = false;
+}
+
+const Vec2Dw &Buffer::GetSelectionStart() {
+	if (m_cursor.y > m_selectionStart.y)
+		return m_selectionStart;
+	else if (m_cursor.y == m_selectionStart.y) {
+		if (m_cursor.x > m_selectionStart.x)
+			return m_selectionStart;
+		else
+			return m_cursor;
+	} else
+		return m_cursor;
+}
+
+const Vec2Dw &Buffer::GetSelectionEnd() {
+	return &GetSelectionStart() == &m_cursor? m_selectionStart : m_cursor;
+}
+
+bool Buffer::HasSelection() {
+	return m_selection;
 }
 
 const std::string &Buffer::CursorLine() const {

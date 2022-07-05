@@ -21,15 +21,35 @@ NC::input_t NC::Input() {
 
 	// parse the escape sequence
 	if (inputSequence.size() == 6 and inputSequence.at(0) == 27) {
-		if (inputSequence.at(1) == '[' and inputSequence.at(2) == '1' and
-		    inputSequence.at(3) == ';' and inputSequence.at(4) == '5')
-		{
-			// CTRL + arrow key sequence, tested on ST
-			switch (inputSequence.at(5)) {
-			case 'A': input = Key::Ctrl(Key::Up);    break;
-			case 'B': input = Key::Ctrl(Key::Down);  break;
-			case 'C': input = Key::Ctrl(Key::Right); break;
-			case 'D': input = Key::Ctrl(Key::Left);  break;
+		if (
+			inputSequence.at(1) == '[' and inputSequence.at(2) == '1' and
+			inputSequence.at(3) == ';'
+		) {
+			switch (inputSequence.at(4)) {
+			case '5':
+				// CTRL + arrow key sequence, tested on ST
+				switch (inputSequence.at(5)) {
+				case 'A': input = Key::Ctrl(Key::Up);    break;
+				case 'B': input = Key::Ctrl(Key::Down);  break;
+				case 'C': input = Key::Ctrl(Key::Right); break;
+				case 'D': input = Key::Ctrl(Key::Left);  break;
+				default: break;
+				}
+
+				break;
+
+			case '6':
+				// CTRL + SHIFT + arrow key sequence, tested on ST
+				switch (inputSequence.at(5)) {
+				case 'A': input = Key::Shift(Key::Ctrl(Key::Up));    break;
+				case 'B': input = Key::Shift(Key::Ctrl(Key::Down));  break;
+				case 'C': input = Key::Shift(Key::Ctrl(Key::Right)); break;
+				case 'D': input = Key::Shift(Key::Ctrl(Key::Left));  break;
+				default: break;
+				}
+
+				break;
+
 			default: break;
 			}
 		}
@@ -50,6 +70,12 @@ NC::input_t NC::Input() {
 		case 525: input = Key::Ctrl(Key::Down);  break;
 		case 560: input = Key::Ctrl(Key::Right); break;
 		case 545: input = Key::Ctrl(Key::Left);  break;
+
+		// CTRL + SHIFT + arrow key codes, tested on xterm, xfce and gnome terminals
+		case 567: input = Key::Shift(Key::Ctrl(Key::Up));    break;
+		case 526: input = Key::Shift(Key::Ctrl(Key::Down));  break;
+		case 561: input = Key::Shift(Key::Ctrl(Key::Right)); break;
+		case 546: input = Key::Shift(Key::Ctrl(Key::Left));  break;
 
 		// sometimes, ncurses gives KEY_ENTER (which is NOT 10), sometimes
 		// it gives '\n' (10) (its just as weird for KEY_BACKSPACE)

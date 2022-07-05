@@ -40,6 +40,12 @@ public:
 	void UpdateCursorY();
 	void UpdateCursor();
 
+	void MarkSelection();
+	void UnmarkSelection();
+	const Vec2Dw &GetSelectionStart();
+	const Vec2Dw &GetSelectionEnd();
+	bool HasSelection();
+
 	const std::string &CursorLine() const;
 	std::string       &CursorLine();
 
@@ -56,8 +62,8 @@ public:
 private:
 	std::size_t CountLineTabs();
 
-	bool   m_modified;
-	Vec2Dw m_cursor;
+	bool   m_modified, m_selection;
+	Vec2Dw m_cursor,   m_selectionStart;
 
 	std::size_t m_furthestCursorX;
 }; // class Buffer

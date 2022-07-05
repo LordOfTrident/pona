@@ -64,21 +64,34 @@ namespace NC {
 			Mouse  = KEY_MOUSE
 		}; // enum Key
 
-		constexpr input_t Ctrl(int p_key) {
-			if (p_key == Up)
-				return static_cast<input_t>(-2);
-			else if (p_key == Down)
-				return static_cast<input_t>(-3);
-			else if (p_key == Right)
-				return static_cast<input_t>(-4);
-			else if (p_key == Left)
-				return static_cast<input_t>(-5);
 
-			return p_key & 31;
+		constexpr input_t Ctrl(input_t p_key) {
+			switch (p_key) {
+			case Up:    return static_cast<input_t>(-2);
+			case Down:  return static_cast<input_t>(-3);
+			case Right: return static_cast<input_t>(-4);
+			case Left:  return static_cast<input_t>(-5);
+			default:    return p_key & 31;
+			}
 		}
 
-		constexpr input_t Alt(int p_key) {
-			return static_cast<input_t>(-5) - p_key;
+		constexpr input_t Alt(input_t p_key) {
+			return static_cast<input_t>(-9) - p_key;
+		}
+
+		constexpr input_t Shift(input_t p_key) {
+			switch (p_key) {
+			case Up:    return 337;
+			case Down:  return 336;
+			case Left:  return 393;
+			case Right: return 402;
+
+			case Ctrl(Up):    return static_cast<input_t>(-6);
+			case Ctrl(Down):  return static_cast<input_t>(-7);
+			case Ctrl(Left):  return static_cast<input_t>(-8);
+			case Ctrl(Right): return static_cast<input_t>(-9);
+			default: return p_key - 33;
+			}
 		}
 	}
 
@@ -106,6 +119,7 @@ namespace NC {
 			Editor_InfoBar,
 			Editor_InfoBarSeparator,
 			Editor_MarkedColumn,
+			Editor_Selection,
 
 			ReservedEnd
 		}; // enum Color

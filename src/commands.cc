@@ -11,7 +11,7 @@ const std::map<std::string, std::pair<bool, char>> Commands::g_list = {
 	{"new",             std::make_pair(false, 't')},
 	{"close",           std::make_pair(false, 'q')},
 	{"save",            std::make_pair(false, 's')},
-	{"save_as",         std::make_pair(true,  'a')},
+	{"save_as",         std::make_pair(true,  ' ')},
 	{"save_config",     std::make_pair(false, ' ')},
 	{"scroll_bar",      std::make_pair(true,  ' ')},
 	{"open",            std::make_pair(true,  'o')},
