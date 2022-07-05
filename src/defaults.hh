@@ -6,16 +6,20 @@
 		"> [github link](https://github.com/LordOfTrident/pona)", \
 		"", \
 		"## Quick-start", \
-		"- `^Q`     - Quit the editor", \
+		"- `^Q`     - Quit the editor/close a tab", \
 		"- `^E`     - Open the command line", \
 		"- `^S`     - Save the current file", \
 		"- `^O`     - Open a file", \
 		"- `ALT+.`  - Next tab", \
 		"- `ALT+,`  - Previous tab", \
-		"- `PPAGE,` - Scroll up", \
-		"- `NPAGE,` - Scroll down", \
 		"", \
 		"> `^<KEY>` - Ctrl+<KEY>", \
+		"", \
+		"## Other keybinds", \
+		"- `ALT+E`  - Go to the end of the line", \
+		"- `^A`     - Select everything", \
+		"- `PPAGE,` - Scroll up", \
+		"- `NPAGE,` - Scroll down", \
 		"", \
 		"## Info bar", \
 		"It is the bottom bar under your editor window. This bar contains some basic info about", \

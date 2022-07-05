@@ -234,12 +234,15 @@ void Editor::Input(NC::input_t p_input) {
 
 		break;
 
+	// specials
 	case NC::Key::Ctrl('a'):
 		buffer.CursorFullDown();
 		buffer.MarkSelection();
 		buffer.CursorFullUp();
 
 		break;
+
+	case NC::Key::Alt('e'): buffer.SetCursorX(buffer.CursorLine().length()); break;
 
 	case NC::Key::PrevPage: ScrollUp();   break;
 	case NC::Key::NextPage: ScrollDown(); break;
