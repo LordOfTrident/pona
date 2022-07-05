@@ -142,6 +142,9 @@ void Editor::CopySelection() {
 }
 
 void Editor::PasteSelection() {
+	if (m_readOnly)
+		return;
+
 	Clipboard::OpenStream(Clipboard::For::Reading);
 
 	if (buffer.HasSelection())
@@ -301,7 +304,7 @@ void Editor::Input(NC::input_t p_input) {
 	case NC::Key::Alt('e'): buffer.SetCursorX(buffer.CursorLine().length()); break;
 
 	case NC::Key::Ctrl('x'):
-		if (not buffer.HasSelection())
+		if (m_readOnly or not buffer.HasSelection())
 			break;
 
 		CopySelection();

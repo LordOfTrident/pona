@@ -35,7 +35,23 @@
 		"- `txt`   shows the file type", \
 		"", \
 		"## List of commands", \
-		"- `help` (`^H`)               - Show the pona help", \
+		"- `help` (`^H`)              - Show the pona help", \
+		"- `exit`                     - Exit the editor", \
+		"- `new` [str:title...] (^T)  - Open new tab(s)", \
+		"- `close` (^Q)               - Close the current tab", \
+		"- `save` (^S)                - Save the current file", \
+		"- `save_as` <str:name>       - Save the current file as ...", \
+		"- `open` <str:name...> (^O)  - Open file(s)", \
+		"", \
+		"- `goto` <int:line> (^L)               - Go to a line", \
+		"- `find` <str:text> (^F)               - Find the string in the file", \
+		"- `find_next` (^N)                     - TODO: Implement", \
+		"- `replace` <str:str1> <str:str2> (^R) - Find and replace str1 with str2", \
+		"- `replace_next` (^N)                  - TODO: Implement", \
+		"- `replace_all`                        - TODO: Implement", \
+		"- `trim`                               - TODO: Implement", \
+		"", \
+		"- `trim_ws_on_save` <bool:on> - Enable/disable trimming trailing whitespaces on save", \
 		"- `ruler <bool:on>`           - Enable/disable the ruler", \
 		"- `scroll_bar <bool:on>`      - Enable/disable the scroll bar", \
 		"- `save_config`               - Save the config as it is", \
@@ -44,20 +60,6 @@
 		"- `theme` <std:name>          - Set the theme (all themes in ~/.config/pona/themes)", \
 		"- `indent_size` <int:size>    - Set the indent size (min 1, max 16)", \
 		"- `mark_column` <int:column>  - Mark the column", \
-		"- `exit`                      - Exit the editor", \
-		"- `new` [str:title...] (^T)   - Open new tab(s)", \
-		"- `close` (^Q)                - Close the current tab", \
-		"- `save` (^S)                 - Save the current file", \
-		"- `save_as` <str:name>        - Save the current file as ...", \
-		"- `open` <str:name...> (^O)   - Open file(s)", \
-		"- `goto` <int:line> (^L)      - Go to a line", \
-		"- `find` <str:text> (^F)      - Find the string in the file", \
-		"- `find_next` (^N)            - TODO: Implement", \
-		"- `replace` (^R)              - TODO: Implement", \
-		"- `replace_next` (^N)         - TODO: Implement", \
-		"- `replace_all`               - TODO: Implement", \
-		"- `trim`                      - TODO: Implement", \
-		"- `trim_ws_on_save` <bool:on> - Enable/disable trimming trailing whitespaces on save", \
 		"", \
 		"> `[]` - Optional parameter", \
 		"> `<>` - Required parameter", \

@@ -420,6 +420,35 @@ void Commands::Run(std::vector<std::string> p_tokens) {
 			std::size_t pos = line.find(p_tokens.at(0));
 			if (pos != std::string::npos) {
 				editor.buffer.SetCursor(Vec2Dw(pos, posY));
+				editor.buffer.MarkSelection();
+				editor.buffer.SetCursor(Vec2Dw(pos + p_tokens.at(0).length(), posY));
+				editor.Update();
+
+				break;
+			}
+
+			++ posY;
+		}
+	} else if (cmd == "replace") { // command replace
+		if (p_tokens.size() != 2) {
+			TopBar::Error("'replace' expects 2 arguments");
+
+			return;
+		}
+
+		std::size_t posY = 0;
+		Editor &editor = Editors::g_list.at(Editors::g_currentIdx);
+
+		for (const auto &line : editor.buffer.rawBuffer) {
+			std::size_t pos = line.find(p_tokens.at(0));
+			if (pos != std::string::npos) {
+				editor.buffer.SetCursor(Vec2Dw(pos, posY));
+				editor.buffer.MarkSelection();
+				editor.buffer.SetCursorX(pos + p_tokens.at(0).length());
+
+				editor.buffer.CursorDelete();
+				editor.buffer.CursorLine().insert(editor.buffer.GetCursor().x, p_tokens.at(1));
+				editor.buffer.SetCursorX(pos + p_tokens.at(1).length());
 				editor.Update();
 
 				break;
