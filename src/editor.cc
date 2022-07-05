@@ -1,4 +1,5 @@
 #include "editor.hh"
+#include "app.hh"
 
 Editor::Editor(
 	const Vec2D &p_size, const Vec2D &p_pos, const std::string &p_title,
@@ -116,6 +117,60 @@ void Editor::ScrollDown() {
 	}
 }
 
+void Editor::CopySelection() {
+	if (not buffer.HasSelection())
+		return;
+
+	Clipboard::OpenStream(Clipboard::For::Writing);
+
+	const Vec2Dw &selectStart = buffer.GetSelectionStart();
+	const Vec2Dw &selectEnd   = buffer.GetSelectionEnd();
+
+	if (selectStart.y == selectEnd.y)
+		Clipboard::WriteString(buffer.rawBuffer.at(selectStart.y).substr(selectStart.x,
+		                     selectEnd.x - selectStart.x));
+	else {
+		Clipboard::WriteString(buffer.rawBuffer.at(selectStart.y).substr(selectStart.x) + '\n');
+
+		for (std::size_t i = selectStart.y + 1; i < selectEnd.y; ++ i)
+			Clipboard::WriteString(buffer.rawBuffer.at(i) + '\n');
+
+		Clipboard::WriteString(buffer.rawBuffer.at(selectEnd.y).substr(0, selectEnd.x));
+	}
+
+	Clipboard::CloseStream();
+}
+
+void Editor::PasteSelection() {
+	Clipboard::OpenStream(Clipboard::For::Reading);
+
+	if (buffer.HasSelection())
+		buffer.CursorDelete();
+
+	std::vector<std::string> pasteBuffer;
+	Clipboard::ReadAll(pasteBuffer);
+
+	if (pasteBuffer.size() == 1) {
+		buffer.rawBuffer.at(buffer.GetCursor().y).insert(buffer.GetCursor().x, pasteBuffer.at(0));
+		buffer.SetCursorX(buffer.GetCursor().x + pasteBuffer.at(0).length());
+	} else if (pasteBuffer.size() > 1) {
+		std::string split = buffer.CursorLine().substr(buffer.GetCursor().x);
+		buffer.CursorLine().erase(buffer.GetCursor().x);
+		buffer.CursorLine() += pasteBuffer.at(0);
+
+		if (pasteBuffer.size()) {
+			buffer.rawBuffer.insert(buffer.rawBuffer.begin() + buffer.GetCursor().y + 1,
+			                        pasteBuffer.begin() + 1, pasteBuffer.end());
+		}
+
+		buffer.SetCursorY(buffer.GetCursor().y + pasteBuffer.size() - 1);
+		buffer.SetCursorX(buffer.CursorLine().length());
+		buffer.CursorLine() += split;
+	}
+
+	Clipboard::CloseStream();
+}
+
 void Editor::Input(NC::input_t p_input) {
 	switch (p_input) {
 	case NC::Key::Mouse:
@@ -149,6 +204,7 @@ void Editor::Input(NC::input_t p_input) {
 						break;
 				}
 
+				buffer.UnmarkSelection();
 				buffer.SetCursorX(i);
 			}
 		}
@@ -243,6 +299,18 @@ void Editor::Input(NC::input_t p_input) {
 		break;
 
 	case NC::Key::Alt('e'): buffer.SetCursorX(buffer.CursorLine().length()); break;
+
+	case NC::Key::Ctrl('x'):
+		if (not buffer.HasSelection())
+			break;
+
+		CopySelection();
+		buffer.CursorDelete();
+
+		break;
+
+	case NC::Key::Ctrl('c'): CopySelection();  break;
+	case NC::Key::Ctrl('v'): PasteSelection(); break;
 
 	case NC::Key::PrevPage: ScrollUp();   break;
 	case NC::Key::NextPage: ScrollDown(); break;
@@ -377,7 +445,6 @@ void Editor::RenderContents() {
 
 void Editor::RenderLine(Vec2Dw &p_pos, bool p_isCursorLine) {
 	const std::string &ref = buffer.rawBuffer.at(p_pos.y);
-	m_lineTabs = std::count(ref.begin(), ref.begin() + m_scroll.x, '\t') * buffer.indentSize;
 
 	short lineColor = p_isCursorLine? NC::ColorPair::Editor_Current : NC::ColorPair::Editor;
 	NC::WSetColor(m_win, lineColor);
@@ -385,8 +452,13 @@ void Editor::RenderLine(Vec2Dw &p_pos, bool p_isCursorLine) {
 	std::string line = ref;
 	line = std::regex_replace(line, std::regex("\t"), std::string(buffer.indentSize, ' '));
 
-	const Vec2Dw &selectionStart = buffer.GetSelectionStart();
-	const Vec2Dw &selectionEnd   = buffer.GetSelectionEnd();
+	Vec2Dw selectStart = buffer.GetSelectionStart();
+	Vec2Dw selectEnd   = buffer.GetSelectionEnd();
+
+	selectStart.x += std::count(ref.begin(), ref.begin() + selectStart.x, '\t') *
+	                 (buffer.indentSize - 1);
+	selectEnd.x += std::count(ref.begin(), ref.begin() + selectEnd.x, '\t') *
+	               (buffer.indentSize - 1);
 
 	for (p_pos.x = m_scroll.x; p_pos.x - m_scroll.x < m_maxLineLength; ++ p_pos.x) {
 		bool markColumn = m_markedColumn and p_pos.x == m_markedColumn;
@@ -396,21 +468,21 @@ void Editor::RenderLine(Vec2Dw &p_pos, bool p_isCursorLine) {
 
 		bool inSelection = false;
 		if (buffer.HasSelection()) {
-			if (selectionStart.y < p_pos.y and selectionEnd.y > p_pos.y)
+			if (selectStart.y < p_pos.y and selectEnd.y > p_pos.y)
 				inSelection = true;
 			else if (
-				selectionStart.y == p_pos.y and selectionEnd.y == p_pos.y and
-				selectionStart.x <= p_pos.x and selectionEnd.x >  p_pos.x
+				selectStart.y == p_pos.y and selectEnd.y == p_pos.y and
+				selectStart.x <= p_pos.x and selectEnd.x >  p_pos.x
 			)
 				inSelection = true;
 			else if (
-				selectionStart.y == p_pos.y and selectionEnd.y != p_pos.y and
-				selectionStart.x <= p_pos.x
+				selectStart.y == p_pos.y and selectEnd.y != p_pos.y and
+				selectStart.x <= p_pos.x
 			)
 				inSelection = true;
 			else if (
-				selectionEnd.y == p_pos.y and selectionStart.y != p_pos.y and
-				selectionEnd.x > p_pos.x
+				selectEnd.y == p_pos.y and selectStart.y != p_pos.y and
+				selectEnd.x > p_pos.x
 			)
 				inSelection = true;
 		}

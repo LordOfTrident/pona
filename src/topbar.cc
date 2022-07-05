@@ -46,8 +46,8 @@ void TopBar::CommandInput(NC::input_t p_input) {
 			// if there is any input, save it to the history and run it
 			g_history.push_back(g_input);
 
-			g_input   = "";
-			g_matches = {};
+			g_input = "";
+			g_matches.clear();
 
 			Commands::Run(g_tokens);
 		}
@@ -332,7 +332,7 @@ void TopBar::Update() {
 		g_tokens = Commands::Parse(g_input);
 
 		// construct the matches list
-		g_matches = {};
+		g_matches.clear();
 		if (g_tokens.size() != 0) {
 			// offset the list position by the amount of spaces
 			// in front of the first command
@@ -439,7 +439,7 @@ void TopBar::Reset() {
 	g_state   = State::None;
 	g_cursorX = 0;
 	g_scrollX = 0;
-	g_matches = {};
+	g_matches.clear();
 	g_historyPos = -1;
 }
 

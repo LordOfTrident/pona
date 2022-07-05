@@ -63,7 +63,7 @@ private:
 	std::size_t CountLineTabs();
 
 	bool   m_modified, m_selection;
-	Vec2Dw m_cursor,   m_selectionStart;
+	Vec2Dw m_cursor,   m_selectStart;
 
 	std::size_t m_furthestCursorX;
 }; // class Buffer

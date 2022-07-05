@@ -12,6 +12,7 @@
 #include "types.hh"
 #include "utils.hh"
 #include "buffer.hh"
+#include "clipboard.hh"
 
 class Editor {
 public:
@@ -38,6 +39,9 @@ public:
 	void ScrollUp();
 	void ScrollDown();
 
+	void CopySelection();
+	void PasteSelection();
+
 	void Input(NC::input_t p_input);
 	void Render();
 
@@ -58,7 +62,7 @@ private:
 	std::size_t m_markedColumn;
 
 	bool m_scrolledUp, m_scrolledDown;
-	std::size_t m_rulerWidth, m_maxLineLength, m_maxLines, m_cursorTabs, m_lineTabs;
+	std::size_t m_rulerWidth, m_maxLineLength, m_maxLines, m_cursorTabs;
 	Vec2D  m_winSize, m_winPos;
 	Vec2Dw m_scroll;
 };

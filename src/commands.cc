@@ -226,7 +226,7 @@ void Commands::Run(std::vector<std::string> p_tokens) {
 		}
 
 		if (unsaved) {
-			TopBar::Ask("Quit? Unsaved changes will be lost.");
+			TopBar::Ask("Quit? Unsaved changes will be lost");
 
 			return;
 		} else
@@ -251,7 +251,7 @@ void Commands::Run(std::vector<std::string> p_tokens) {
 			TopBar::Reset();
 		else if (Editors::g_list.size() > 1) {
 			if (not TopBar::g_answer and Editors::g_list.at(Editors::g_currentIdx).buffer.IsModified()) {
-				TopBar::Ask("Close tab? Unsaved changes will be lost.");
+				TopBar::Ask("Close tab? Unsaved changes will be lost");
 
 				return;
 			}
@@ -262,7 +262,7 @@ void Commands::Run(std::vector<std::string> p_tokens) {
 				-- Editors::g_currentIdx;
 		} else {
 			if (not TopBar::g_answer and Editors::g_list.at(0).buffer.IsModified()) {
-				TopBar::Ask("Quit? Unsaved changes will be lost.");
+				TopBar::Ask("Quit? Unsaved changes will be lost");
 
 				return;
 			}

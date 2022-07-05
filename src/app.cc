@@ -92,6 +92,7 @@ void Init(const std::vector<std::string> &p_args) {
 	getmaxyx(stdscr, g_winSize.y, g_winSize.x);
 	erase();
 
+	Clipboard::Init();
 	TopBar::Init();
 	refresh();
 
@@ -117,6 +118,9 @@ void Init(const std::vector<std::string> &p_args) {
 
 		Editors::g_currentIdx = Editors::g_list.size() - 1;
 	}
+
+	if (not Clipboard::HasXClip())
+		TopBar::Error("XClip is not available, clipboard will not work across applications");
 }
 
 void Finish() {

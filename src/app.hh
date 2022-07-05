@@ -17,6 +17,7 @@
 #include "utils.hh"
 #include "ini.hh"
 #include "editor.hh"
+#include "clipboard.hh"
 
 void Init(const std::vector<std::string> &p_args);
 void Finish();

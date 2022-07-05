@@ -177,27 +177,27 @@ void Buffer::CursorInsert(char p_ch) {
 
 void Buffer::CursorDelete() {
 	if (m_selection) {
-		Vec2Dw selectionStart = GetSelectionStart();
+		Vec2Dw selectStart = GetSelectionStart();
 		Vec2Dw selectionEnd   = GetSelectionEnd();
 
-		if (selectionStart.y == selectionEnd.y) {
-			std::string linePart1 = CursorLine().substr(0, selectionStart.x);
+		if (selectStart.y == selectionEnd.y) {
+			std::string linePart1 = CursorLine().substr(0, selectStart.x);
 			std::string linePart2 = CursorLine().substr(selectionEnd.x);
 
 			CursorLine() = linePart1 + linePart2;
 			m_cursor.x   = linePart1.length();
 		} else {
-			rawBuffer.erase(rawBuffer.begin() + selectionStart.y + 1,
+			rawBuffer.erase(rawBuffer.begin() + selectStart.y + 1,
 			                rawBuffer.begin() + selectionEnd.y);
 
-			selectionEnd.y = selectionStart.y + 1;
+			selectionEnd.y = selectStart.y + 1;
 
-			std::string linePart1 = rawBuffer.at(selectionStart.y).substr(0, selectionStart.x);
+			std::string linePart1 = rawBuffer.at(selectStart.y).substr(0, selectStart.x);
 			std::string linePart2 = rawBuffer.at(selectionEnd.y).substr(selectionEnd.x);
 
 			rawBuffer.erase(rawBuffer.begin() + selectionEnd.y);
 
-			m_cursor.y   = selectionStart.y;
+			m_cursor.y   = selectStart.y;
 			CursorLine() = linePart1 + linePart2;
 			m_cursor.x   = linePart1.length();
 		}
@@ -255,7 +255,7 @@ void Buffer::UpdateCursor() {
 }
 
 void Buffer::MarkSelection() {
-	m_selectionStart = m_cursor;
+	m_selectStart = m_cursor;
 	m_selection      = true;
 }
 
@@ -264,11 +264,11 @@ void Buffer::UnmarkSelection() {
 }
 
 const Vec2Dw &Buffer::GetSelectionStart() {
-	if (m_cursor.y > m_selectionStart.y)
-		return m_selectionStart;
-	else if (m_cursor.y == m_selectionStart.y) {
-		if (m_cursor.x > m_selectionStart.x)
-			return m_selectionStart;
+	if (m_cursor.y > m_selectStart.y)
+		return m_selectStart;
+	else if (m_cursor.y == m_selectStart.y) {
+		if (m_cursor.x > m_selectStart.x)
+			return m_selectStart;
 		else
 			return m_cursor;
 	} else
@@ -276,7 +276,7 @@ const Vec2Dw &Buffer::GetSelectionStart() {
 }
 
 const Vec2Dw &Buffer::GetSelectionEnd() {
-	return &GetSelectionStart() == &m_cursor? m_selectionStart : m_cursor;
+	return &GetSelectionStart() == &m_cursor? m_selectStart : m_cursor;
 }
 
 bool Buffer::HasSelection() {

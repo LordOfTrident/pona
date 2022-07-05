@@ -42,7 +42,7 @@ in the editor.
 - [X] Command line
 - [X] Mouse input
 - [X] Selection
-- [ ] Copy/cut/paste
+- [X] Copy/cut/paste
 - [ ] Lua plugins
 
 ## Bugs
@@ -50,6 +50,7 @@ If you find any bugs, please create an issue and describe them.
 
 ## Dependencies
 - [ncurses](https://en.wikipedia.org/wiki/Ncurses)
+- [xclip](https://github.com/astrand/xclip)
 
 ## Make
 Run `make all` to see all the make rules, `make` to compile a static binary.
