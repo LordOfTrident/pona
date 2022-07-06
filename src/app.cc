@@ -11,7 +11,7 @@ ColorPairKeyPair::ColorPairKeyPair(
 Config g_config;
 
 // i do not want a thousand if statements, so i made some maps to shorten code
-std::array<ColorPairKeyPair, NC::ColorPair::ReservedEnd - 1> g_keyToColorPairMap = {
+std::array<ColorPairKeyPair, NC::ColorPair::Count - 1> g_keyToColorPairMap = {
 	ColorPairKeyPair("top_bar", "", NC::ColorPair::TopBar),
 
 	ColorPairKeyPair("top_bar", "input", NC::ColorPair::TopBar_Input),
@@ -188,8 +188,13 @@ void Update() {
 short StringToColor(const std::string &p_str) {
 	if (g_stringColorMap.count(p_str))
 		return g_stringColorMap.at(p_str);
-	else
-		throw std::runtime_error(p_str + " is not a color");
+	else {
+		try {
+			return std::stoi(p_str);
+		} catch (...) {
+			throw std::runtime_error(p_str + " is not a color");
+		}
+	}
 }
 
 void Defaults() {
@@ -220,6 +225,7 @@ void Defaults() {
 	g_config.indentSize   = 4;
 	g_config.markedColumn = 0;
 	g_config.theme        = "default";
+	g_config.separator    = '|';
 }
 
 void ReadOrFixConfig() {
@@ -352,6 +358,18 @@ void UpdateTheme() {
 		return;
 	}
 
+	if (theme.Contains("info_bar", "separator")) {
+		std::string str = theme.At("info_bar", "separator");
+
+		if (str.length() > 4) {
+			TopBar::Error("info_bar::separator expected char, in theme " + g_config.theme);
+
+			return;
+		}
+
+		g_config.separator = Utils::UTF8ToUTF32(str.c_str());
+	}
+
 	for (const auto &[section, key, colorPair] : g_keyToColorPairMap) {
 		std::string keyFg = key == ""? "fg" : key + "_fg";
 		std::string keyBg = key == ""? "bg" : key + "_bg";
@@ -369,13 +387,18 @@ void UpdateTheme() {
 		std::string fgColorString = theme.At(section, keyFg);
 		std::string bgColorString = theme.At(section, keyBg);
 
+		short fg, bg;
+
 		try {
-			init_pair(colorPair, StringToColor(fgColorString), StringToColor(bgColorString));
+			fg = StringToColor(fgColorString);
+			bg = StringToColor(bgColorString);
 		} catch (const std::exception &p_except) {
 			TopBar::Error(std::string(p_except.what()) + ", from theme " + g_config.theme);
 
 			return;
 		}
+
+		init_pair(colorPair, fg, bg);
 	}
 }
 
@@ -456,6 +479,7 @@ void Editors::UpdateEditorConfig(Editor &p_editor) {
 	p_editor.EnableScrollBar(g_config.scrollBar);
 	p_editor.SetIndentSize(g_config.indentSize);
 	p_editor.SetMarkedColumn(g_config.markedColumn);
+	p_editor.SetSeparator(g_config.separator);
 }
 
 void Editors::UpdateAllEditorConfigs() {

@@ -12,6 +12,7 @@ Editor::Editor(
 	m_ruler(true),
 	m_scrollBar(true),
 	m_markedColumn(0),
+	m_separator('|'),
 
 	m_scrolledUp(false),
 	m_scrolledDown(false),
@@ -98,6 +99,10 @@ void Editor::SetIndentSize(std::uint8_t p_indentSize) {
 
 void Editor::SetMarkedColumn(std::size_t p_markedColumn) {
 	m_markedColumn = p_markedColumn;
+}
+
+void Editor::SetSeparator(wchar_t p_separator) {
+	m_separator = p_separator;
 }
 
 void Editor::SetReadOnly(bool p_readOnly) {
@@ -341,35 +346,35 @@ void Editor::RenderInfoBar() {
 	NC::WSetColor(m_win, NC::ColorPair::Editor_InfoBar);
 
 	mvwhline(m_win, m_winSize.y - 1, 0, ' ', m_winSize.x);
-
-	std::string posStr = std::to_string(buffer.GetCursor().y + 1) +
-	                     ':' + std::to_string(buffer.GetCursor().x + 1);
-	mvwaddstr(m_win, m_winSize.y - 1, m_winSize.x - posStr.length() - 1, posStr.c_str());
 	mvwaddstr(m_win, m_winSize.y - 1, 1, "^G ");
 
 	NC::WSetColor(m_win, NC::ColorPair::Editor_InfoBarSeparator);
-	waddch(m_win, '|');
+	NC::WAddWCh(m_win, m_separator);
 
 	NC::WSetColor(m_win, NC::ColorPair::Editor_InfoBar);
 	waddstr(m_win, " ASCII ");
 
 	NC::WSetColor(m_win, NC::ColorPair::Editor_InfoBarSeparator);
-	waddch(m_win, '|');
+	NC::WAddWCh(m_win, m_separator);
 
 	NC::WSetColor(m_win, NC::ColorPair::Editor_InfoBar);
 	waddstr(m_win, " LF ");
 
 	NC::WSetColor(m_win, NC::ColorPair::Editor_InfoBarSeparator);
-	waddch(m_win, '|');
+	NC::WAddWCh(m_win, m_separator);
 
 	NC::WSetColor(m_win, NC::ColorPair::Editor_InfoBar);
 	waddstr(m_win, m_readOnly? " R " : " RW ");
 
 	NC::WSetColor(m_win, NC::ColorPair::Editor_InfoBarSeparator);
-	waddch(m_win, '|');
+	NC::WAddWCh(m_win, m_separator);
 
 	NC::WSetColor(m_win, NC::ColorPair::Editor_InfoBar);
 	waddstr(m_win, " txt ");
+
+	std::string posStr = std::to_string(buffer.GetCursor().y + 1) +
+	                     ':' + std::to_string(buffer.GetCursor().x + 1);
+	mvwaddstr(m_win, m_winSize.y - 1, m_winSize.x - posStr.length() - 1, posStr.c_str());
 }
 
 void Editor::RenderScrollBar() {
@@ -550,7 +555,7 @@ void Editor::RenderBelowContents() {
 				if (m_markedColumn) {
 					NC::WSetColor(m_win, NC::ColorPair::Editor_MarkedColumn);
 
-					mvwhline(m_win, pos.y, pos.x, ' ', m_maxLineLength - pos.x);
+					mvwhline(m_win, pos.y, pos.x, ' ', m_maxLineLength - pos.x + m_rulerWidth);
 					mvwaddch(m_win, pos.y, pos.x, ACS_VLINE);
 				}
 

@@ -1,7 +1,7 @@
 #ifndef NCURSESW_HH__HEADER_GUARD__
 #define NCURSESW_HH__HEADER_GUARD__
 
-#include <cstdint>       // std::uint64_t
+#include <cstdint>       // std::uint64_t, std::uint8_t
 #include <vector>        // std::vector
 #include <unordered_map> // std::unordered_map
 #include <ncurses.h>     // terminal i/o
@@ -11,16 +11,6 @@
 #endif // NCURSES_WIDECHAR
 
 namespace NC {
-	using input_t = std::uint64_t;
-
-	extern std::unordered_map<WINDOW*, int> g_lastColorPair;
-
-	input_t Input();
-
-	int  WAddWCh(WINDOW *p_win, wchar_t p_wCh);
-	int  MoveWAddWCh(WINDOW *p_win, int p_y, int p_x, wchar_t p_wCh);
-	void WSetColor(WINDOW *p_win, int p_color);
-
 	namespace Color {
 		enum Color : short {
 			Default = -1,
@@ -41,9 +31,27 @@ namespace NC {
 			BrightBlue,
 			BrightMagenta,
 			BrightCyan,
-			BrightWhite
+			BrightWhite,
+
+			Count
 		}; // enum Color
 	}
+
+	struct RGB {
+		RGB(std::uint8_t p_r = 0, std::uint8_t p_g = 0, std::uint8_t p_b = 0);
+
+		std::uint8_t r, g, b;
+	};
+
+	using input_t = std::uint64_t;
+
+	extern std::unordered_map<WINDOW*, int> g_lastColorPair;
+
+	input_t Input();
+
+	int  WAddWCh(WINDOW *p_win, wchar_t p_wCh);
+	int  MoveWAddWCh(WINDOW *p_win, int p_y, int p_x, wchar_t p_wCh);
+	void WSetColor(WINDOW *p_win, int p_color);
 
 	namespace Key {
 		enum Key : input_t {
@@ -121,7 +129,7 @@ namespace NC {
 			Editor_MarkedColumn,
 			Editor_Selection,
 
-			ReservedEnd
+			Count
 		}; // enum Color
 	} // namespace Color
 } // namespace NC

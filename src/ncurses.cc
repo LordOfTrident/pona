@@ -2,6 +2,12 @@
 
 std::unordered_map<WINDOW*, int> NC::g_lastColorPair;
 
+NC::RGB::RGB(std::uint8_t p_r, std::uint8_t p_g, std::uint8_t p_b):
+	r(p_r),
+	g(p_g),
+	b(p_b)
+{}
+
 NC::input_t NC::Input() {
 	int     rawInput = getch();
 	input_t input    = rawInput;

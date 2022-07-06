@@ -42,6 +42,8 @@ namespace Utils {
 	bool IsWordCh(char p_ch);
 	bool IsLinkCh(char p_ch);
 
+	wchar_t UTF8ToUTF32(const char p_ch[5]);
+
 	std::string ToString(bool p_value);
 }
 

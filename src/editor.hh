@@ -34,6 +34,7 @@ public:
 	void EnableScrollBar(bool p_scrollBar);
 	void SetIndentSize(std::uint8_t p_indentSize);
 	void SetMarkedColumn(std::size_t p_markedColumn);
+	void SetSeparator(wchar_t p_separator);
 	void SetReadOnly(bool p_readOnly);
 
 	void ScrollUp();
@@ -60,6 +61,7 @@ private:
 
 	bool m_ruler, m_scrollBar, m_readOnly;
 	std::size_t m_markedColumn;
+	wchar_t     m_separator;
 
 	bool m_scrolledUp, m_scrolledDown;
 	std::size_t m_rulerWidth, m_maxLineLength, m_maxLines, m_cursorTabs;

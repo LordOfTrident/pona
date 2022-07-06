@@ -183,6 +183,26 @@ bool Utils::IsLinkCh(char p_ch) {
 	}
 }
 
+wchar_t Utils::UTF8ToUTF32(const char p_ch[5]) {
+    if ((p_ch[0] & 128) == 0)
+        return p_ch[0] & 127;
+    else if ((p_ch[0] & 224) == 192)
+        return
+            (p_ch[0] & 31) << 6 |
+            (p_ch[1] & 63);
+    else if ((p_ch[0] & 240) == 224)
+        return
+            (p_ch[0] & 15) << 12 |
+            (p_ch[1] & 63) << 6  |
+            (p_ch[2] & 63);
+    else
+        return
+            (p_ch[0] & 7)  << 18 |
+            (p_ch[1] & 63) << 12 |
+            (p_ch[2] & 63) << 6  |
+            (p_ch[3] & 63);
+}
+
 std::string Utils::ToString(bool p_value) {
 	return p_value? "true" : "false";
 }

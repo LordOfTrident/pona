@@ -121,7 +121,8 @@
 		"bg = white", \
 		"", \
 		"separator_fg = black", \
-		"separator_bg = white" \
+		"separator_bg = white", \
+		"separator    = |" \
 	}
 
 #define DEFAULT_THEME_CLASSIC { \
@@ -176,7 +177,8 @@
 		"bg = white", \
 		"", \
 		"separator_fg = black", \
-		"separator_bg = white" \
+		"separator_bg = white", \
+		"separator    = |" \
 	}
 
 #define DEFAULT_THEME_TILDE { \
@@ -231,7 +233,8 @@
 		"bg = cyan", \
 		"", \
 		"separator_fg = blue", \
-		"separator_bg = cyan" \
+		"separator_bg = cyan", \
+		"separator    = |" \
 	}
 
 #define DEFAULT_THEME_16 { \
@@ -286,7 +289,8 @@
 		"bg = green", \
 		"", \
 		"separator_fg = grey", \
-		"separator_bg = green" \
+		"separator_bg = green", \
+		"separator    = |" \
 	}
 
 #endif

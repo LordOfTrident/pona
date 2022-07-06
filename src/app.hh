@@ -43,6 +43,7 @@ struct Config {
 	std::uint8_t indentSize;
 	std::size_t  markedColumn;
 	std::string  theme;
+	wchar_t      separator;
 }; // struct Config
 
 struct ColorPairKeyPair {
@@ -55,7 +56,7 @@ struct ColorPairKeyPair {
 
 extern Config g_config;
 
-extern std::array<ColorPairKeyPair, NC::ColorPair::ReservedEnd - 1> g_keyToColorPairMap;
+extern std::array<ColorPairKeyPair, NC::ColorPair::Count - 1> g_keyToColorPairMap;
 
 extern std::unordered_map<std::string, short> g_stringColorMap;
 extern std::vector<std::string> g_args;
