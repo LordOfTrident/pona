@@ -19,7 +19,7 @@
 #include "editor.hh"
 #include "clipboard.hh"
 
-void Init(const std::vector<std::string> &p_args);
+void Init(const std::vector<std::string> &p_args, const std::string &p_title);
 void Finish();
 
 void Run();

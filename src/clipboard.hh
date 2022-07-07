@@ -3,7 +3,7 @@
 
 #include <string>    // std::string
 #include <vector>    // std::vector
-#include <cstdio>    // std::FILE, popen, pclose, std::fputs, std::fgetc
+#include <cstdio>    // std::FILE, popen, pclose, std::fputs, std::fgetc, EOF
 #include <stdexcept> // std::runtime_error
 
 namespace Clipboard {

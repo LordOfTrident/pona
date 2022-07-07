@@ -46,7 +46,7 @@ int main(int p_argc, const char *p_argv[]) {
 	}
 
 	try {
-		Init(args);
+		Init(args, "Pona");
 		Run();
 		Finish();
 	} catch (const std::runtime_error &p_except) {

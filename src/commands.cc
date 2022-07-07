@@ -153,6 +153,7 @@ void Commands::Run(std::vector<std::string> p_tokens) {
 
 		g_config.theme = p_tokens.at(0);
 		UpdateTheme();
+		Editors::UpdateAllEditorConfigs();
 	} else if (cmd == "scroll_bar") { // command scroll_bar
 		if (p_tokens.size() != 1) {
 			TopBar::Error("'scroll_bar' expects 1 argument");

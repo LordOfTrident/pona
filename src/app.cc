@@ -71,7 +71,7 @@ Vec2D g_winSize;
 std::vector<Editor> Editors::g_list;
 std::size_t Editors::g_currentIdx = 0;
 
-void Init(const std::vector<std::string> &p_args) {
+void Init(const std::vector<std::string> &p_args, const std::string &p_title) {
 	g_args = p_args;
 
 	std::setlocale(LC_CTYPE, "");
@@ -88,6 +88,8 @@ void Init(const std::vector<std::string> &p_args) {
 	mouseinterval(0);
 
 	ESCDELAY = 0; // no delay when escape is pressed
+
+	putp(("\033]0;" + p_title + "\007").c_str());
 
 	getmaxyx(stdscr, g_winSize.y, g_winSize.x);
 	erase();
@@ -339,8 +341,6 @@ void WriteConfigFile() {
 void UpdateTheme() {
 	if (not Utils::PathExists(ConfigPath()/"themes"/std::string(g_config.theme + ".ini"))) {
 		TopBar::Error("Theme file ~/.config/pona/themes/" + g_config.theme + ".ini not found");
-
-		g_config.theme = "default";
 
 		return;
 	}
