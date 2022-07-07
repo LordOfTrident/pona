@@ -45,10 +45,10 @@
 		"", \
 		"- `goto` <int:line> (^L)               - Go to a line", \
 		"- `find` <str:text> (^F)               - Find the string in the file", \
-		"- `find_next` (^N)                     - TODO: Implement", \
 		"- `replace` <str:str1> <str:str2> (^R) - Find and replace str1 with str2", \
-		"- `replace_next` (^N)                  - TODO: Implement", \
-		"- `replace_all`                        - TODO: Implement", \
+		"- `replace_all`                        - Find and replace all occurences of str1 with " \
+		                                        " str starting from cursor pos", \
+		"- `next` (^N)                          - Run the last find/replace command again", \
 		"- `trim`                               - TODO: Implement", \
 		"", \
 		"- `trim_ws_on_save` <bool:on> - Enable/disable trimming trailing whitespaces on save", \

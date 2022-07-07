@@ -43,7 +43,7 @@ in the editor.
 - [X] Mouse input
 - [X] Selection
 - [X] Copy/cut/paste
-- [ ] Find and replace commands
+- [X] Find and replace commands
 - [ ] Build and run commands
 - [ ] Syntax highlighting
 - [ ] Lua plugins

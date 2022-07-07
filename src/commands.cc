@@ -9,6 +9,7 @@ const std::map<std::string, std::pair<bool, char>> Commands::g_list = {
 	{"indent_size",     std::make_pair(true,  ' ')},
 	{"exit",            std::make_pair(false, ' ')},
 	{"new",             std::make_pair(false, 't')},
+	{"next",            std::make_pair(false, 'n')},
 	{"close",           std::make_pair(false, 'q')},
 	{"save",            std::make_pair(false, 's')},
 	{"save_as",         std::make_pair(true,  ' ')},
@@ -17,16 +18,16 @@ const std::map<std::string, std::pair<bool, char>> Commands::g_list = {
 	{"open",            std::make_pair(true,  'o')},
 	{"goto",            std::make_pair(true,  'l')},
 	{"find",            std::make_pair(true,  'f')},
-	{"find_next",       std::make_pair(false, ' ')},
 	{"reload_config",   std::make_pair(false, ' ')},
 	{"replace",         std::make_pair(true,  'r')},
-	{"replace_next",    std::make_pair(false, ' ')},
 	{"replace_all",     std::make_pair(true,  ' ')},
 	{"ruler",           std::make_pair(true,  ' ')},
 	{"theme",           std::make_pair(true,  ' ')},
 	{"trim",            std::make_pair(true,  ' ')},
 	{"trim_ws_on_save", std::make_pair(true,  ' ')}
 };
+
+std::vector<std::string> Commands::g_lastMatchCmdTokens;
 
 std::vector<std::string> Commands::Parse(std::string p_cmd) {
 	Utils::TrimStringLeft(p_cmd);
@@ -72,6 +73,10 @@ void Commands::Run(std::vector<std::string> p_tokens) {
 	}
 
 	std::string cmd = p_tokens.at(0);
+
+	if (cmd == "replace" or cmd == "find")
+		g_lastMatchCmdTokens = p_tokens;
+
 	// remove the command name from the tokens, so we only get the arguments
 	p_tokens.erase(p_tokens.begin());
 
@@ -211,7 +216,7 @@ void Commands::Run(std::vector<std::string> p_tokens) {
 			return;
 		}
 
-		if (TopBar::g_answer) {
+		if (TopBar::g_answer == TopBar::Answer::Yes) {
 			g_quit = true;
 
 			return;
@@ -248,10 +253,16 @@ void Commands::Run(std::vector<std::string> p_tokens) {
 			return;
 		}
 
+		if (TopBar::g_answer == TopBar::Answer::No)
+			return;
+
 		if (TopBar::g_state == TopBar::State::Input or TopBar::g_state == TopBar::State::Question)
 			TopBar::Reset();
 		else if (Editors::g_list.size() > 1) {
-			if (not TopBar::g_answer and Editors::g_list.at(Editors::g_currentIdx).buffer.IsModified()) {
+			if (
+				TopBar::g_answer == TopBar::Answer::None and
+				Editors::g_list.at(Editors::g_currentIdx).buffer.IsModified()
+			) {
 				TopBar::Ask("Close tab? Unsaved changes will be lost");
 
 				return;
@@ -262,7 +273,10 @@ void Commands::Run(std::vector<std::string> p_tokens) {
 			if (Editors::g_currentIdx == Editors::g_list.size())
 				-- Editors::g_currentIdx;
 		} else {
-			if (not TopBar::g_answer and Editors::g_list.at(0).buffer.IsModified()) {
+			if (
+				TopBar::g_answer == TopBar::Answer::None and
+				Editors::g_list.at(0).buffer.IsModified()
+			) {
 				TopBar::Ask("Quit? Unsaved changes will be lost");
 
 				return;
@@ -316,21 +330,31 @@ void Commands::Run(std::vector<std::string> p_tokens) {
 			return;
 		}
 
-		Editor &editor = Editors::g_list.at(Editors::g_currentIdx);
+			Editor &editor = Editors::g_list.at(Editors::g_currentIdx);
 
-		if (g_config.trimOnSave) {
-			for (auto &line : Editors::g_list.at(Editors::g_currentIdx).buffer.rawBuffer) {
-				Utils::TrimStringRight(line);
-				Utils::TrimStringRight(line, '\t');
+		if (
+			editor.GetTitle() != path and Utils::PathExists(path) and
+			TopBar::g_answer == TopBar::Answer::None
+		)
+			TopBar::Ask("File '" + path + "' already exists. Do you want to overwrite it?");
+		else if (
+			TopBar::g_answer == TopBar::Answer::Yes or
+			TopBar::g_answer == TopBar::Answer::None
+		) {
+			if (g_config.trimOnSave) {
+				for (auto &line : Editors::g_list.at(Editors::g_currentIdx).buffer.rawBuffer) {
+					Utils::TrimStringRight(line);
+					Utils::TrimStringRight(line, '\t');
+				}
+
+				editor.Update();
 			}
 
-			editor.Update();
+			Utils::WriteFile(path, Editors::g_list.at(Editors::g_currentIdx).buffer.rawBuffer);
+
+			editor.SetTitle(path);
+			editor.buffer.FlagUnmodified();
 		}
-
-		Utils::WriteFile(path, Editors::g_list.at(Editors::g_currentIdx).buffer.rawBuffer);
-
-		editor.SetTitle(path);
-		editor.buffer.FlagUnmodified();
 	} else if (cmd == "open") { // command open
 		if (p_tokens.size() < 1) {
 			TopBar::Error("'open' expects at least 1 argument");
@@ -418,22 +442,36 @@ void Commands::Run(std::vector<std::string> p_tokens) {
 			return;
 		}
 
-		std::size_t posY = 0;
 		Editor &editor = Editors::g_list.at(Editors::g_currentIdx);
 
-		for (const auto &line : editor.buffer.rawBuffer) {
-			std::size_t pos = line.find(p_tokens.at(0));
-			if (pos != std::string::npos) {
-				editor.buffer.SetCursor(Vec2Dw(pos, posY));
-				editor.buffer.MarkSelection();
-				editor.buffer.SetCursor(Vec2Dw(pos + p_tokens.at(0).length(), posY));
-				editor.Update();
+		int loopCount = 2;
+		while (loopCount > 0) {
+			-- loopCount;
 
-				break;
+			Vec2Dw pos(editor.buffer.GetCursor());
+			for (; pos.y < editor.buffer.Size(); ++ pos.y) {
+				const auto &line = editor.buffer.rawBuffer.at(pos.y);
+
+				pos.x = line.find(p_tokens.at(0), pos.x);
+				if (pos.x != std::string::npos) {
+					editor.buffer.SetCursor(pos);
+					editor.buffer.MarkSelection();
+					editor.buffer.SetCursorX(pos.x + p_tokens.at(0).length());
+					editor.Update();
+
+					++ pos.y;
+
+					return;
+				}
+
+				pos.x = 0;
+				++ pos.y;
 			}
 
-			++ posY;
+			editor.buffer.SetCursor(Vec2Dw(0, 0));
 		}
+
+		TopBar::Error("No matches to '" + p_tokens.at(0) + "'");
 	} else if (cmd == "replace") { // command replace
 		if (p_tokens.size() != 2) {
 			TopBar::Error("'replace' expects 2 arguments");
@@ -441,26 +479,102 @@ void Commands::Run(std::vector<std::string> p_tokens) {
 			return;
 		}
 
-		std::size_t posY = 0;
 		Editor &editor = Editors::g_list.at(Editors::g_currentIdx);
 
-		for (const auto &line : editor.buffer.rawBuffer) {
-			std::size_t pos = line.find(p_tokens.at(0));
-			if (pos != std::string::npos) {
-				editor.buffer.SetCursor(Vec2Dw(pos, posY));
-				editor.buffer.MarkSelection();
-				editor.buffer.SetCursorX(pos + p_tokens.at(0).length());
+		if (TopBar::g_answer == TopBar::Answer::No) {
+			editor.buffer.UnmarkSelection();
 
-				editor.buffer.CursorDelete();
-				editor.buffer.CursorLine().insert(editor.buffer.GetCursor().x, p_tokens.at(1));
-				editor.buffer.SetCursorX(pos + p_tokens.at(1).length());
-				editor.Update();
+			return;
+		} else if (TopBar::g_answer == TopBar::Answer::Yes) {
+			editor.buffer.CursorDelete();
+			editor.buffer.CursorLine().insert(editor.buffer.GetCursor().x, p_tokens.at(1));
+			editor.buffer.SetCursorX(editor.buffer.GetCursor().x + p_tokens.at(1).length());
+			editor.Update();
+		} else if (TopBar::g_answer == TopBar::Answer::None) {
+			int loopCount = 2;
+			while (loopCount > 0) {
+				-- loopCount;
 
-				break;
+				Vec2Dw pos(editor.buffer.GetCursor());
+				for (; pos.y < editor.buffer.Size(); ++ pos.y) {
+					const auto &line = editor.buffer.rawBuffer.at(pos.y);
+
+					pos.x = line.find(p_tokens.at(0), pos.x);
+					if (pos.x != std::string::npos) {
+						editor.buffer.SetCursor(pos);
+						editor.buffer.MarkSelection();
+						editor.buffer.SetCursorX(pos.x + p_tokens.at(0).length());
+
+						TopBar::Ask("Are you sure you want to replace?");
+
+						return;
+					}
+
+					pos.x = 0;
+					++ pos.y;
+				}
+
+				editor.buffer.SetCursor(Vec2Dw(0, 0));
+			}
+		}
+	} else if (cmd == "replace_all") { // command replace_all
+		if (p_tokens.size() != 2) {
+			TopBar::Error("'replace' expects 2 arguments");
+
+			return;
+		}
+
+		Editor &editor = Editors::g_list.at(Editors::g_currentIdx);
+
+		if (TopBar::g_answer == TopBar::Answer::Yes) {
+			editor.buffer.CursorDelete();
+			editor.buffer.CursorLine().insert(editor.buffer.GetCursor().x, p_tokens.at(1));
+			editor.buffer.SetCursorX(editor.buffer.GetCursor().x + p_tokens.at(1).length());
+			editor.Update();
+
+			TopBar::g_answer = TopBar::Answer::None;
+			Run(TopBar::g_tokens);
+		} else if (
+			TopBar::g_answer == TopBar::Answer::None or
+			TopBar::g_answer == TopBar::Answer::No
+		) {
+			Vec2Dw pos(editor.buffer.GetCursor());
+			for (; pos.y < editor.buffer.Size(); ++ pos.y) {
+				const auto &line = editor.buffer.rawBuffer.at(pos.y);
+
+				pos.x = line.find(p_tokens.at(0), pos.x);
+				if (pos.x != std::string::npos) {
+					editor.buffer.SetCursor(pos);
+					editor.buffer.MarkSelection();
+					editor.buffer.SetCursorX(pos.x + p_tokens.at(0).length());
+
+					TopBar::Ask("Are you sure you want to replace?");
+
+					return;
+				}
+
+				pos.x = 0;
+				++ pos.y;
 			}
 
-			++ posY;
+			editor.buffer.UnmarkSelection();
+			editor.buffer.SetCursor(Vec2Dw(0, 0));
 		}
+	} else if (cmd == "next") { // command next
+		if (p_tokens.size() != 0) {
+			TopBar::Error("'next' expects 0 arguments");
+
+			return;
+		}
+
+		if (g_lastMatchCmdTokens.size() == 0) {
+			TopBar::Error("find/replace has to be ran before next");
+
+			return;
+		}
+
+		TopBar::g_tokens = g_lastMatchCmdTokens;
+		Run(TopBar::g_tokens);
 	} else // TODO: implement all commands
 		TopBar::Error("Command '" + cmd + "' not implemented");
 }

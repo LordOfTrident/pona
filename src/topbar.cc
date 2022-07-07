@@ -4,8 +4,8 @@ WINDOW *TopBar::g_win = nullptr, *TopBar::g_matchListWin = nullptr;
 
 TopBar::State TopBar::g_state = TopBar::State::None;
 
-std::string TopBar::g_input;
-bool        TopBar::g_answer = false;
+std::string    TopBar::g_input;
+TopBar::Answer TopBar::g_answer = Answer::None;
 
 std::size_t TopBar::g_cursorX = 0, TopBar::g_scrollX = 0, TopBar::g_length;
 
@@ -167,20 +167,28 @@ void TopBar::QuestionInput(NC::input_t p_input) {
 	switch (p_input) {
 	case 'y': case 'Y':
 		g_state  = State::None;
-		g_answer = true;
+		g_answer = Answer::Yes;
 		g_input  = "";
 
 		// run the command which asked this
 		Commands::Run(g_tokens);
 
-		g_answer = false;
+		g_answer = Answer::None;
 
 		break;
 
 	case 'n': case 'N':
 		g_state  = State::None;
-		g_answer = false;
+		g_answer = Answer::No;
 		g_input  = "";
+
+		Commands::Run(g_tokens);
+
+		g_answer = Answer::None;
+
+		break;
+
+	case NC::Key::Ctrl('q'): Reset(); break;
 
 	default: break;
 	}
@@ -230,7 +238,7 @@ void TopBar::RenderMessage() {
 	              NC::ColorPair::TopBar_Input);
 
 	// if it is a question, add (y/n) to the text
-	std::string text = g_input + (g_state == State::Question? " (y/n)" : "");
+	std::string text = g_input + (g_state == State::Question? " (y/n/^Q)" : "");
 
 	mvwaddch(g_win, 0, 3, ' ');
 	for (std::size_t i = 0; i < g_length; ++ i) {
@@ -425,8 +433,9 @@ void TopBar::SetInput(const std::string &p_input) {
 }
 
 void TopBar::Ask(const std::string &p_question) {
-	g_state = State::Question;
-	g_input = p_question;
+	g_answer = Answer::None;
+	g_state  = State::Question;
+	g_input  = p_question;
 }
 
 void TopBar::Error(const std::string &p_msg) {

@@ -10,7 +10,7 @@
 
 class Buffer {
 public:
-	Buffer(const std::vector<std::string> &p_buffer);
+	Buffer(const std::vector<std::string> &p_buffer, std::size_t p_sizeLimit = -1);
 
 	char  At(const Vec2Dw &p_pos) const;
 	char &At(const Vec2Dw &p_pos);
@@ -64,6 +64,7 @@ private:
 
 	bool   m_modified, m_selection;
 	Vec2Dw m_cursor,   m_selectStart;
+	std::size_t m_sizeLimit;
 
 	std::size_t m_furthestCursorX;
 }; // class Buffer

@@ -1,11 +1,12 @@
 #include "buffer.hh"
 
-Buffer::Buffer(const std::vector<std::string> &p_buffer):
+Buffer::Buffer(const std::vector<std::string> &p_buffer, std::size_t p_sizeLimit):
 	indentSize(4),
 
 	rawBuffer(p_buffer),
 	m_modified(false),
 	m_selection(false),
+	m_sizeLimit(p_sizeLimit),
 
 	m_furthestCursorX(0)
 {}
@@ -30,6 +31,24 @@ void Buffer::SetCursor(const Vec2Dw &p_cursor) {
 	m_cursor = p_cursor;
 	UpdateCursor();
 
+	// we are keeping track of a m_furthestCursorX variable because of a subtle but really
+	// important feature. Take this buffer
+	//   1234567
+	//   12
+	//   1234|67
+	// as an example, where the cursor is |. When you move the cursor up twice, it should
+	// end up on the 3 right? like so:
+	//   12|4567
+	//   12
+	//   1234567
+	// because it jumps down on the line `12` and then goes up to the same X position. but in
+	// most modern text editors, this does not happen. Instead, the cursor will be at where
+	// it started, at the 5 like so:
+	//   1234|67
+	//   12
+	//   1234567
+
+	// this is the purpose of this variable; to keep track of that position
 	m_furthestCursorX = m_cursor.x + CountLineTabs();
 }
 

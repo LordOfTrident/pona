@@ -84,6 +84,8 @@ namespace Commands {
 	void Run(std::vector<std::string> p_tokens);
 
 	extern const std::map<std::string, std::pair<bool, char>> g_list;
+
+	extern std::vector<std::string> g_lastMatchCmdTokens;
 } // namespace Commands
 
 namespace TopBar {
@@ -93,6 +95,12 @@ namespace TopBar {
 		Error,
 		Question
 	}; // enum class State
+
+	enum class Answer {
+		None = 0,
+		Yes,
+		No
+	}; // enum class Answer
 
 	void Init();
 	void Finish();
@@ -126,7 +134,7 @@ namespace TopBar {
 	extern State g_state;
 
 	extern std::string g_input;
-	extern bool        g_answer;
+	extern Answer      g_answer;
 
 	extern std::size_t g_cursorX, g_scrollX, g_length;
 
