@@ -89,7 +89,7 @@ void Init(const std::vector<std::string> &p_args, const std::string &p_title) {
 
 	ESCDELAY = 0; // no delay when escape is pressed
 
-	putp(("\033]0;" + p_title + "\007").c_str());
+	putp(("\033]0;" + p_title + "\007\n").c_str());
 
 	getmaxyx(stdscr, g_winSize.y, g_winSize.x);
 	erase();
