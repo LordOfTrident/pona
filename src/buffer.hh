@@ -42,8 +42,10 @@ public:
 
 	void MarkSelection();
 	void UnmarkSelection();
-	const Vec2Dw &GetSelectionStart();
-	const Vec2Dw &GetSelectionEnd();
+	Vec2Dw &GetSelectionStart();
+	Vec2Dw &GetSelectionEnd();
+	const Vec2Dw &GetSelectionStart() const;
+	const Vec2Dw &GetSelectionEnd()   const;
 	bool HasSelection();
 
 	const std::string &CursorLine() const;
@@ -64,7 +66,9 @@ private:
 
 	bool   m_modified, m_selection;
 	Vec2Dw m_cursor,   m_selectStart;
-	std::size_t m_sizeLimit;
+	std::size_t m_sizeLimit; // TODO: make this limit the amount of lines the buffer can have
+	// this feature will be used so the Buffer class can be used for the command line, instead of
+	// having a custom buffer and repeating code
 
 	std::size_t m_furthestCursorX;
 }; // class Buffer

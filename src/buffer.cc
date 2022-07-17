@@ -196,8 +196,8 @@ void Buffer::CursorInsert(char p_ch) {
 
 void Buffer::CursorDelete() {
 	if (m_selection) {
-		Vec2Dw selectStart = GetSelectionStart();
-		Vec2Dw selectionEnd   = GetSelectionEnd();
+		Vec2Dw selectStart  = GetSelectionStart();
+		Vec2Dw selectionEnd = GetSelectionEnd();
 
 		if (selectStart.y == selectionEnd.y) {
 			std::string linePart1 = CursorLine().substr(0, selectStart.x);
@@ -249,9 +249,14 @@ void Buffer::CursorSplit() {
 	if (newLine.length() > 0)
 		CursorLine().erase(m_cursor.x);
 
+	std::size_t i = 0;
+	while (CursorLine()[i] == '\t') // not using .at() because i dont want an out of range exception
+		++ i;
+
 	++ m_cursor.y;
 	rawBuffer.insert(rawBuffer.begin() + m_cursor.y, newLine);
-	m_cursor.x = 0;
+	CursorLine() = std::string(i, '\t') + CursorLine();
+	m_cursor.x = i;
 
 	m_furthestCursorX = m_cursor.x + CountLineTabs();
 	m_modified = true;
@@ -282,7 +287,7 @@ void Buffer::UnmarkSelection() {
 	m_selection = false;
 }
 
-const Vec2Dw &Buffer::GetSelectionStart() {
+Vec2Dw &Buffer::GetSelectionStart() {
 	if (m_cursor.y > m_selectStart.y)
 		return m_selectStart;
 	else if (m_cursor.y == m_selectStart.y) {
@@ -294,8 +299,16 @@ const Vec2Dw &Buffer::GetSelectionStart() {
 		return m_cursor;
 }
 
-const Vec2Dw &Buffer::GetSelectionEnd() {
+Vec2Dw &Buffer::GetSelectionEnd() {
 	return &GetSelectionStart() == &m_cursor? m_selectStart : m_cursor;
+}
+
+const Vec2Dw &Buffer::GetSelectionStart() const {
+	return GetSelectionStart();
+}
+
+const Vec2Dw &Buffer::GetSelectionEnd() const {
+	return GetSelectionEnd();
 }
 
 bool Buffer::HasSelection() {

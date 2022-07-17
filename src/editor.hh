@@ -43,6 +43,9 @@ public:
 	void CopySelection();
 	void PasteSelection();
 
+	bool IndentMoveLeft();
+	bool IndentMoveRight();
+
 	void Input(NC::input_t p_input);
 	void Render();
 

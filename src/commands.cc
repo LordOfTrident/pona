@@ -1,4 +1,7 @@
 #include "app.hh"
+#include "topbar.hh"
+
+// TODO: the command system sometimes gets really messy, should rewrite some time later
 
 // ONLY space (' ') means no shortcut, dont use anything else for that
 const std::map<std::string, std::pair<bool, char>> Commands::g_list = {

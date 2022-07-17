@@ -70,8 +70,11 @@ NC::input_t NC::Input() {
 		case 195: input = Key::Alt(inputSequence.at(1) - 96);  break;
 		}
 	} else {
-		// CTRL + arrow key codes, tested on xterm, xfce and gnome terminals
 		switch (input) {
+		// SHIFT + tab, tested on st, xterm, xfce and gnome terminals
+		case 353: input = Key::Shift(Key::Tab); break;
+
+		// CTRL + arrow key codes, tested on xterm, xfce and gnome terminals
 		case 566: input = Key::Ctrl(Key::Up);    break;
 		case 525: input = Key::Ctrl(Key::Down);  break;
 		case 560: input = Key::Ctrl(Key::Right); break;

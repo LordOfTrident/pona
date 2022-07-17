@@ -1,5 +1,5 @@
 #include "editor.hh"
-#include "app.hh"
+#include "topbar.hh"
 
 Editor::Editor(
 	const Vec2D &p_size, const Vec2D &p_pos, const std::string &p_title,
@@ -179,6 +179,54 @@ void Editor::PasteSelection() {
 	Clipboard::CloseStream();
 }
 
+bool Editor::IndentMoveLeft() {
+	Vec2Dw &selectStart = buffer.GetSelectionStart();
+	Vec2Dw &selectEnd   = buffer.GetSelectionEnd();
+
+	if (buffer.HasSelection() and selectStart.y != selectEnd.y) {
+		for (std::size_t i = selectStart.y; i <= selectEnd.y; ++ i) {
+			if (buffer.rawBuffer.at(i).length() == 0)
+				continue;
+
+			if (buffer.At(Vec2Dw(0, i)) == '\t') {
+				if (i == selectStart.y)
+					++ selectStart.x;
+				else if (i == selectEnd.y)
+					++ selectEnd.x;
+
+				buffer.rawBuffer.at(i) = buffer.rawBuffer.at(i).substr(1);
+			}
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+bool Editor::IndentMoveRight() {
+	Vec2Dw &selectStart = buffer.GetSelectionStart();
+	Vec2Dw &selectEnd   = buffer.GetSelectionEnd();
+
+	if (buffer.HasSelection() and selectStart.y != selectEnd.y) {
+		for (std::size_t i = selectStart.y; i <= selectEnd.y; ++ i) {
+			if (buffer.rawBuffer.at(i).length() == 0)
+				continue;
+
+			if (i == selectStart.y)
+				++ selectStart.x;
+			else if (i == selectEnd.y)
+				++ selectEnd.x;
+
+			buffer.rawBuffer.at(i) = std::string("\t") + buffer.rawBuffer.at(i);
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
 void Editor::Input(NC::input_t p_input) {
 	switch (p_input) {
 	case NC::Key::Mouse:
@@ -323,6 +371,14 @@ void Editor::Input(NC::input_t p_input) {
 	case NC::Key::PrevPage: ScrollUp();   break;
 	case NC::Key::NextPage: ScrollDown(); break;
 
+	case NC::Key::Shift(NC::Key::Tab): IndentMoveLeft(); break;
+
+	case NC::Key::Tab:
+		if (IndentMoveRight())
+			break;
+
+		// fall through
+
 	default:
 		if (((p_input >= 32 and p_input <= 127) or (p_input == NC::Key::Tab)) and not m_readOnly)
 			buffer.CursorInsert(p_input);
@@ -452,6 +508,8 @@ void Editor::RenderContents() {
 }
 
 void Editor::RenderLine(Vec2Dw &p_pos, bool p_isCursorLine) {
+	// TODO: really ugly and messy rendering system, should rewrite some time later
+
 	const std::string &ref = buffer.rawBuffer.at(p_pos.y);
 
 	short lineColor = p_isCursorLine? NC::ColorPair::Editor_Current : NC::ColorPair::Editor;

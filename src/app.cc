@@ -1,4 +1,5 @@
 #include "app.hh"
+#include "topbar.hh"
 
 ColorPairKeyPair::ColorPairKeyPair(
 	const std::string &p_section, const std::string &p_key, short p_colorPair

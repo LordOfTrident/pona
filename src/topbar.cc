@@ -1,3 +1,4 @@
+#include "topbar.hh"
 #include "app.hh"
 
 WINDOW *TopBar::g_win = nullptr, *TopBar::g_matchListWin = nullptr;

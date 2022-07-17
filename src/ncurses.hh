@@ -98,6 +98,8 @@ namespace NC {
 			case Ctrl(Down):  return static_cast<input_t>(-7);
 			case Ctrl(Left):  return static_cast<input_t>(-8);
 			case Ctrl(Right): return static_cast<input_t>(-9);
+
+			case Tab: return 353;
 			default: return p_key - 33;
 			}
 		}
