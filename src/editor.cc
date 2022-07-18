@@ -199,9 +199,8 @@ bool Editor::IndentMoveLeft() {
 		}
 
 		return true;
-	}
-
-	return false;
+	} else
+		return false;
 }
 
 bool Editor::IndentMoveRight() {
@@ -222,9 +221,8 @@ bool Editor::IndentMoveRight() {
 		}
 
 		return true;
-	}
-
-	return false;
+	} else
+		return false;
 }
 
 void Editor::Input(NC::input_t p_input) {

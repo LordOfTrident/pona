@@ -304,11 +304,19 @@ Vec2Dw &Buffer::GetSelectionEnd() {
 }
 
 const Vec2Dw &Buffer::GetSelectionStart() const {
-	return GetSelectionStart();
+	if (m_cursor.y > m_selectStart.y)
+		return m_selectStart;
+	else if (m_cursor.y == m_selectStart.y) {
+		if (m_cursor.x > m_selectStart.x)
+			return m_selectStart;
+		else
+			return m_cursor;
+	} else
+		return m_cursor;
 }
 
 const Vec2Dw &Buffer::GetSelectionEnd() const {
-	return GetSelectionEnd();
+	return &GetSelectionStart() == &m_cursor? m_selectStart : m_cursor;
 }
 
 bool Buffer::HasSelection() {
