@@ -27,7 +27,7 @@
 A [C++](https://en.wikipedia.org/wiki/C%2B%2B) [terminal](https://en.wikipedia.org/wiki/Terminal_emulator)
 [text editor](https://en.wikipedia.org/wiki/Text_editor) for [Linux](https://en.wikipedia.org/wiki/Linux).
 Unlike my other editor, [tr-ed](https://github.com/LordOfTrident/trident-editor), this aims to be simpler,
-faster to use and atleast a bit more practical. For help on how to use the editor, press Ctrl+H while
+faster to use and at least a bit more practical. For help on how to use the editor, press Ctrl+H while
 in the editor.
 
 ## Features

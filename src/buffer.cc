@@ -196,8 +196,8 @@ void Buffer::CursorInsert(char p_ch) {
 
 void Buffer::CursorDelete() {
 	if (m_selection) {
-		Vec2Dw selectStart  = GetSelectionStart();
-		Vec2Dw selectionEnd = GetSelectionEnd();
+		Vec2Dw selectStart = GetSelectionStart();
+		Vec2Dw selectEnd   = GetSelectionEnd();
 
 		if (selectStart.y == selectionEnd.y) {
 			std::string linePart1 = CursorLine().substr(0, selectStart.x);
@@ -280,7 +280,7 @@ void Buffer::UpdateCursor() {
 
 void Buffer::MarkSelection() {
 	m_selectStart = m_cursor;
-	m_selection      = true;
+	m_selection   = true;
 }
 
 void Buffer::UnmarkSelection() {
