@@ -199,22 +199,21 @@ void Buffer::CursorDelete() {
 		Vec2Dw selectStart = GetSelectionStart();
 		Vec2Dw selectEnd   = GetSelectionEnd();
 
-		if (selectStart.y == selectionEnd.y) {
+		if (selectStart.y == selectEnd.y) {
 			std::string linePart1 = CursorLine().substr(0, selectStart.x);
-			std::string linePart2 = CursorLine().substr(selectionEnd.x);
+			std::string linePart2 = CursorLine().substr(selectEnd.x);
 
 			CursorLine() = linePart1 + linePart2;
 			m_cursor.x   = linePart1.length();
 		} else {
-			rawBuffer.erase(rawBuffer.begin() + selectStart.y + 1,
-			                rawBuffer.begin() + selectionEnd.y);
+			rawBuffer.erase(rawBuffer.begin() + selectStart.y + 1, rawBuffer.begin() + selectEnd.y);
 
-			selectionEnd.y = selectStart.y + 1;
+			selectEnd.y = selectStart.y + 1;
 
 			std::string linePart1 = rawBuffer.at(selectStart.y).substr(0, selectStart.x);
-			std::string linePart2 = rawBuffer.at(selectionEnd.y).substr(selectionEnd.x);
+			std::string linePart2 = rawBuffer.at(selectEnd.y).substr(selectEnd.x);
 
-			rawBuffer.erase(rawBuffer.begin() + selectionEnd.y);
+			rawBuffer.erase(rawBuffer.begin() + selectEnd.y);
 
 			m_cursor.y   = selectStart.y;
 			CursorLine() = linePart1 + linePart2;
