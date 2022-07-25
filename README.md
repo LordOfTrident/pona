@@ -49,6 +49,9 @@ in the editor.
 - [ ] Lua plugins
 
 ## Bugs
+- If the current line has tabs and you click at the end of the line to position the cursor there,
+  the cursor will be offset to the left by tab size * tabs count
+
 If you find any bugs, please create an issue and report them.
 
 ## Dependencies
