@@ -152,9 +152,9 @@
 		"current_bg = blue", \
 		"", \
 		"ruler_fg         = yellow", \
-		"ruler_bg         = black", \
+		"ruler_bg         = blue", \
 		"ruler_current_fg = white", \
-		"ruler_current_bg = black", \
+		"ruler_current_bg = blue", \
 		"", \
 		"marked_column_fg = red", \
 		"marked_column_bg = blue", \

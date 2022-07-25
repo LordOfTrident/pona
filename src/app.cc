@@ -155,7 +155,9 @@ void Input() {
 		getmaxyx(stdscr, g_winSize.y, g_winSize.x);
 
 		TopBar::ResizeWindow();
-		Editors::g_list.at(Editors::g_currentIdx).ResizeWindow(Vec2D(g_winSize.x, g_winSize.y - 1));
+
+		for (auto &editor : Editors::g_list)
+			editor.ResizeWindow(Vec2D(g_winSize.x, g_winSize.y - 1));
 
 		break;
 
