@@ -26,7 +26,7 @@ void Clipboard::CloseXClipFile() {
 
 void Clipboard::Init() {
 	try {
-		OpenXClipFile("w");
+		OpenXClipFile("r");
 		CloseXClipFile();
 	} catch (const std::exception &p_except) {
 		g_hasXClip = false;
